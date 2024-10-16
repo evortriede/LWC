@@ -1,0 +1,116 @@
+<html>
+ <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /> 
+  <meta http-equiv="Pragma" content="no-cache" /> 
+  <meta http-equiv="Expires" content="0" />
+
+   <script>
+    var currentVoice;
+    function loadIFrame(url)
+    {
+      document.getElementById("theFrame").src=url+"?"+Math.random();
+    }
+    function centerText(ctx,txt,vpos)
+    {
+      let hpos=(200-ctx.measureText(txt).width)/2;
+      ctx.strokeText(txt,hpos,vpos);
+    }
+    function drawMeter(name,style,metric,txt)
+    {
+      canvas=document.getElementById(name);
+      canvas.hidden="";
+      ctx=canvas.getContext("2d");
+      ctx.fillStyle=style;
+      ctx.clearRect(0,0,200,500);
+      ctx.fillRect(25, 500-metric, 150, metric);
+      ctx.font="30px Arial";
+      centerText(ctx,name,30);
+      centerText(ctx,txt, Math.max(250,500-(metric/2)));
+    }
+    var toSay="Nothing to say";
+    function sayIt()
+    {
+      if (currentVoice===undefined)
+      {
+        initVoice();
+      }
+      let utterance = new SpeechSynthesisUtterance(toSay);
+      utterance.voice=currentVoice;
+      speechSynthesis.speak(utterance);
+    }
+    function onMessage(event) 
+    {
+      rg=event.data.split(',');
+      document.getElementById('gallons').value=rg[0];
+      document.getElementById('gph').value=rg[1];
+      document.getElementById('gpd').value=rg[2];
+      document.getElementById('duty').value=rg[3];
+      document.getElementById("pump").value=rg[6];
+
+      let gal=rg[0];
+      let x=gal/46;
+      let pct = (gal/23784)*100;
+      var style="#00FF00";
+      if (pct < 33)
+      {
+        style = "#FF0000";
+      }
+      else if (pct < 50)
+      {
+        style = "#FFFF00";
+      }
+
+      drawMeter("TankLevel",style,x,pct.toFixed(0) + "%");
+      if (rg[1]<0)
+      {
+        drawMeter("Turbidity",(rg[4]<0.3)?"#00FF00":(rg[4]>1.0)?"#FF0000":"#FFFF00",rg[4]*1000,rg[4]+"ntu");
+        drawMeter("Chlorine",(rg[5]<0.3)?"#FFFF00":(rg[5]>1.0)?"#FF0000":"#00FF00",rg[5]*231,rg[5]+"ppm");
+      }
+      toSay="There are "+gal+" gallons in the tanks which is "+pct.toFixed(0)+" percent.";
+    }
+    function initVoice()
+    {
+      const voices = speechSynthesis.getVoices();
+//      alert(voices.length);
+      for (let i=0; i < voices.length; i++)
+      {
+        if (voices[i].default)
+        {
+          currentVoice=voices[i];
+          break;
+        }
+      }
+    }
+	</script>
+ </head>
+ <body onload="initVoice();">
+    <canvas id="TankLevel" width="200" height="500"
+    style="border:1px solid #c3c3c3;">
+    Your browser does not support the canvas element.
+    </canvas>
+    <canvas id="Turbidity" width="200" height="500"
+    style="border:1px solid #c3c3c3;" hidden="hidden">
+    Your browser does not support the canvas element.
+    </canvas>
+    <canvas id="Chlorine" width="200" height="500"
+    style="border:1px solid #c3c3c3;" hidden="hidden">
+    Your browser does not support the canvas element.
+    </canvas>
+    
+    <div style='font-size:250%'>
+      Pump Setting <input id="pump" value=0, style='font-size:40px; border:none'></input><br>
+      Tank Level <input id='gallons' value='12345' style='font-size:40px; border:none'></input><br>
+      Usage last hour <input id='gph' value='0' style='font-size:40px; border:none'></input> <br>
+      Usage last 24 hours <input id='gpd' value='0' style='font-size:40px; border:none'></input> <br>
+      Duty cycle <input id='duty' value='0' style='font-size:40px; border:none'></input><br>
+      <button onclick="sayIt();" style='font-size:40px;'>Speak It</button>
+    </div>
+   <script>
+     url=window.location.protocol+"//"+window.location.hostname+"/getit.php";
+     setInterval(loadIFrame, 60000, url);
+     window.addEventListener("message", onMessage);
+     loadIFrame(url);
+   </script>
+   <iframe id='theFrame' name='theFrame' src='getit.php' hidden='hidden'></iframe>
+ </body> 
+</html>

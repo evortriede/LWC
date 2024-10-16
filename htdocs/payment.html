@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/WCBS.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>London Water Co-op - Payments</title>
+</head>
+
+<body>
+<script>
+  function computeCost()
+  {
+    var rate = 0.029;
+    var irate = 1.029;
+    var amount = document.getElementById("amount").value;
+    if (amount=="") amount="0";
+    var famount=parseFloat(amount);
+    var cost = 0.3 * irate;
+    cost += famount * rate;
+    cost *= irate;
+    document.getElementById("cost").value = cost.toFixed(2);
+    var total =  cost + famount;
+    document.getElementById("total").value = total.toFixed(2);
+  }
+</script>
+    <div id="main">
+      <h1>London Water Co-op<br><br>Online Payments</h1>
+      <p style="font-size:large;">London Water Co-op (LWC) now offers the capability to make online payments with credit or debit cards.  <br>
+      We offer this capability as a convenience to our members and their renters. <br>
+      The convenience of paying by credit card comes at a cost, which we pass on to you as a &quot;convenience fee&quot; that you can see in the box with that label below.  This fee simply covers our cost in offering this feature to you.  <br><br></p>
+      
+      <h2>Instructions:</h2><br>
+      
+      <p style="font-size:large;">
+      Fill in your first and last name, email address, property address and the amount that you wish to pay toward the fees due to LWC. <br> 
+      The convenience fee amount will be displayed as you enter the amount and will be added to the total.<br> 
+      When you press the Pay button, you will be taken to a secure payment page where your credit card information will be collected and the payment will be processed.<br><br>
+      <br></p>
+      
+      <p>
+      <form method="POST" action="anet_payment.php">
+        <table>
+          <tr><td>First Name</td><td><input type="text" name="bill_to_forename" id="bill_to_forename" maxlength="50" required></td><td></td></tr>
+          <tr><td>Last Name</td><td><input type="text" name="bill_to_surname" id="bill_to_surname" maxlength="50" required></td><td></td></tr>
+          <tr><td>Email address</td><td><input type="email" name="bill_to_email" id="bill_to_email" required></td><td></td></tr>
+          <tr><td>Property address</td><td><input type="text" name="property_address" id="property_address" required></td><td></td></tr>
+          <tr><td><br></td><td></td><td></td></tr>
+          <tr><td>Amount</td><td><input type="number" step=".01" name="amount" id="amount" oninput="computeCost();" onchange="computeCost();" required></td><td>US Dollars</td></tr>
+          <tr><td></td><td></td><td></td></tr>
+          <tr><td>Convenience fee</td><td><input type="text" name="cost" id="cost" readonly></td><td></td></tr>
+          <tr><td><br></td><td></td><td></td></tr>
+          <tr><td><br></td><td></td><td></td></tr>
+          <tr><td>Total</td><td><input type="text" name="total" id="total" readonly></td><td><input type="submit" value="Pay"</td></tr>
+        </table>
+      </form>
+      </p>
+    </div>
+</body>
+<!-- InstanceEnd --></html>
